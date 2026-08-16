@@ -1,0 +1,53 @@
+diff --git a/BUILD.bazel b/BUILD.bazel
+index 80965fc..c950109 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -120,16 +120,13 @@ genrule(
+         "rounding.c",
+         "rsync.h",
+         ":proto_h",
+-        "@openssl//:gen_dir",
+     ],
+     outs = ["rounding.h"],
+     cmd = """
+ cp $(location :proto_h) proto.h
+-GEN_DIR="$(location @openssl//:gen_dir)"
+-OPENSSL_INC_DIR="$$GEN_DIR/include"
+ CC="$${CC:-cc}"
+ for r in 0 1 3; do
+-  if "$$CC" -o rounding -DEXTRA_ROUNDING=$$r -I. -I"$$OPENSSL_INC_DIR" $(location rounding.c) >rounding.out 2>&1; then
++  if "$$CC" -o rounding -DEXTRA_ROUNDING=$$r -DRSYNC_NO_OPENSSL -I. $(location rounding.c) >rounding.out 2>&1; then
+     echo "#define EXTRA_ROUNDING $$r" > $@
+     if test -n "$${HOME-}" && test -f "$${HOME-}/build_farm/build_test.fns"; then
+       echo "EXTRA_ROUNDING is $$r" >&2
+@@ -218,7 +215,7 @@ cc_library(
+     ],
+     includes = ["zlib"],
+     deps = [
+-        "@openssl//:crypto",
++        "@ssl_lib//:crypto",
+     ],
+ )
+ 
+@@ -244,7 +241,7 @@ cc_library(
+         ":popt",
+         ":zlib",
+         "@lz4",
+-        "@openssl//:crypto",
++        "@ssl_lib//:crypto",
+         "@xxhash",
+         "@zstd",
+     ],
+diff --git a/MODULE.bazel b/MODULE.bazel
+index 580e2f3..8451d2d 100644
+--- a/MODULE.bazel
++++ b/MODULE.bazel
+@@ -7,7 +7,7 @@ module(
+ )
+ 
+ bazel_dep(name = "rules_cc", version = "0.2.16")
+-bazel_dep(name = "openssl", version = "3.5.5.bcr.4")
++bazel_dep(name = "ssl_lib", version = "1.0.0")
+ bazel_dep(name = "zstd", version = "1.5.7")
+ bazel_dep(name = "lz4", version = "1.10.0.bcr.1")
+ bazel_dep(name = "xxhash", version = "0.8.3.bcr.1")

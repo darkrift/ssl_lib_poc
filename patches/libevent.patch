@@ -1,0 +1,80 @@
+diff --git a/BUILD.bazel b/BUILD.bazel
+index 549ede9..97cc623 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -241,8 +241,8 @@ cc_library(
+     deps = [
+         ":event_core",
+         ":event_core_private_headers",
+-        "@openssl//:crypto",
+-        "@openssl//:ssl",
++        "@ssl_lib//:crypto",
++        "@ssl_lib//:ssl",
+     ],
+ )
+ 
+@@ -260,8 +260,8 @@ cc_library(
+         ":event_core",
+         ":event_core_private_headers",
+         ":event_openssl_private_headers",
+-        "@openssl//:crypto",
+-        "@openssl//:ssl",
++        "@ssl_lib//:crypto",
++        "@ssl_lib//:ssl",
+     ],
+ )
+ 
+diff --git a/MODULE.bazel b/MODULE.bazel
+index 401f7b6..aa1a4f1 100644
+--- a/MODULE.bazel
++++ b/MODULE.bazel
+@@ -4,7 +4,7 @@ module(
+     compatibility_level = 1,
+ )
+ 
+-bazel_dep(name = "openssl", version = "3.3.1.bcr.1")
++bazel_dep(name = "ssl_lib", version = "1.0.0")
+ bazel_dep(name = "platforms", version = "0.0.10")
+ bazel_dep(name = "rules_cc", version = "0.0.17")
+ bazel_dep(name = "rules_license", version = "1.0.0")
+diff --git a/sample/BUILD.bazel b/sample/BUILD.bazel
+index 316b678..87e4caf 100644
+--- a/sample/BUILD.bazel
++++ b/sample/BUILD.bazel
+@@ -70,8 +70,8 @@ cc_binary(
+         "//:event_core",
+         "//:event_extra",
+         "//:event_openssl",
+-        "@openssl//:crypto",
+-        "@openssl//:ssl",
++        "@ssl_lib//:crypto",
++        "@ssl_lib//:ssl",
+     ],
+ )
+ 
+@@ -106,8 +106,8 @@ cc_binary(
+         "//:event_extra",
+         "//:event_openssl",
+         "//:event_openssl_private_headers",
+-        "@openssl//:crypto",
+-        "@openssl//:ssl",
++        "@ssl_lib//:crypto",
++        "@ssl_lib//:ssl",
+     ],
+ )
+ 
+diff --git a/test/BUILD.bazel b/test/BUILD.bazel
+index 1fe3906..3ede1fd 100644
+--- a/test/BUILD.bazel
++++ b/test/BUILD.bazel
+@@ -107,8 +107,8 @@ cc_test(
+         "//:event_openssl",
+         "//:event_openssl_private_headers",
+         "//:event_pthreads",
+-        "@openssl//:crypto",
+-        "@openssl//:ssl",
++        "@ssl_lib//:crypto",
++        "@ssl_lib//:ssl",
+         "@zlib//:z",
+     ],
+ )

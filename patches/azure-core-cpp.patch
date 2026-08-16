@@ -1,0 +1,63 @@
+diff --git a/BUILD.bazel b/BUILD.bazel
+index 38eb426..492dd7a 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -18,14 +18,21 @@ config_setting(
+     flag_values = {":build_transport_curl": "false"},
+ )
+ 
+-# If we're building azure_core_cpp with Curl as a transport, we must ensure curl
+-# was built with OpenSSL and not another SSL lib, as azure_core_cpp only
+-# supports OpenSSL.
++# Keep Azure Core and its Curl transport on the same ssl_lib facade. The
++# mbedTLS Curl mode is incompatible with Azure Core's OpenSSL-compatible APIs.
+ selects.config_setting_group(
+-    name = "build_transport_curl_openssl",
++    name = "curl_uses_ssl_lib",
++    match_any = [
++        "@curl//:use_boringssl",
++        "@curl//:use_openssl",
++    ],
++)
++
++selects.config_setting_group(
++    name = "build_transport_curl_ssl_lib",
+     match_all = [
+         ":build_transport_curl_setting",
+-        "@curl//:use_openssl",
++        ":curl_uses_ssl_lib",
+     ],
+ )
+ 
+@@ -100,15 +107,15 @@ cc_library(
+         # hashing.
+         "@platforms//os:windows": [],
+         "//conditions:default": [
+-            "@openssl//:crypto",
+-            "@openssl//:ssl",
++            "@ssl_lib//:crypto",
++            "@ssl_lib//:ssl",
+         ],
+     }) + select(
+         {
+-            ":build_transport_curl_openssl": ["@curl"],
++            ":build_transport_curl_ssl_lib": ["@curl"],
+             ":not_build_transport_curl_setting": [],
+         },
+-        no_match_error = "azure_core_cpp must be built with --@curl//:ssl_lib=openssl when Curl is enabled as a transport",
++        no_match_error = "azure_core_cpp requires curl to use ssl_lib rather than mbedtls",
+     ) + select({
+         ":build_transport_winhttp_setting": [
+             # TODO: add wil as a dep here when it's in the BCR:
+diff --git a/MODULE.bazel b/MODULE.bazel
+index a6dd8e2..d514d65 100644
+--- a/MODULE.bazel
++++ b/MODULE.bazel
+@@ -8,6 +8,6 @@ module(
+ bazel_dep(name = "bazel_skylib", version = "1.7.1")
+ bazel_dep(name = "curl", version = "8.8.0.bcr.3")
+ bazel_dep(name = "googletest", version = "1.16.0")
+-bazel_dep(name = "openssl", version = "3.3.1.bcr.1")
++bazel_dep(name = "ssl_lib", version = "1.0.0")
+ bazel_dep(name = "platforms", version = "0.0.11")
+ bazel_dep(name = "rules_cc", version = "0.1.1")

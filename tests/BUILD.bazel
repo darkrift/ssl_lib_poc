@@ -1,0 +1,102 @@
+load(
+    ":ssl_graph_test.bzl",
+    "single_ssl_implementation_test",
+    "ssl_implementations_test",
+)
+
+package(default_visibility = ["//visibility:private"])
+
+# This is the regression check that matters for librdkafka: its with_cfg
+# transition must select OpenSSL for librdkafka itself and for transitive curl.
+single_ssl_implementation_test(
+    name = "librdkafka_uses_only_openssl",
+    size = "small",
+    expected = "openssl",
+    target = "//examples:librdkafka",
+)
+
+single_ssl_implementation_test(
+    name = "azure_core_cpp_uses_only_openssl",
+    size = "small",
+    expected = "openssl",
+    target = "//examples:azure-core-cpp",
+)
+
+single_ssl_implementation_test(
+    name = "fastdds_uses_only_openssl",
+    size = "small",
+    expected = "openssl",
+    target = "//examples:fastdds",
+)
+
+single_ssl_implementation_test(
+    name = "folly_uses_only_openssl",
+    size = "small",
+    expected = "openssl",
+    target = "//examples:folly",
+)
+
+single_ssl_implementation_test(
+    name = "ppp_uses_only_openssl",
+    size = "small",
+    expected = "openssl",
+    target = "//examples:ppp",
+)
+
+# Prove that the checker observes each post-transition curl graph rather than
+# merely inheriting the command-line default (which is BoringSSL).
+single_ssl_implementation_test(
+    name = "curl_boringssl_uses_only_boringssl",
+    size = "small",
+    expected = "boringssl",
+    target = "//examples:curl_boringssl",
+)
+
+single_ssl_implementation_test(
+    name = "curl_openssl_uses_only_openssl",
+    size = "small",
+    expected = "openssl",
+    target = "//examples:curl_openssl",
+)
+
+single_ssl_implementation_test(
+    name = "curl_mbedtls_uses_only_mbedtls",
+    size = "small",
+    expected = "mbedtls",
+    target = "//examples:curl_mbedtls",
+)
+
+single_ssl_implementation_test(
+    name = "curl_aws_lc_uses_only_aws_lc",
+    size = "small",
+    expected = "aws-lc",
+    target = "//examples:curl_aws_lc",
+)
+
+# This is intentionally not a singleton graph: librdkafka's own TLS source is
+# OpenSSL-only, while the HTTP/OIDC curl edge uses its native Mbed TLS backend.
+ssl_implementations_test(
+    name = "librdkafka_openssl_curl_mbedtls_uses_exact_backends",
+    size = "small",
+    expected = [
+        "mbedtls",
+        "openssl",
+    ],
+    target = "//examples:librdkafka_openssl_curl_mbedtls",
+)
+
+test_suite(
+    name = "ssl_graph_tests",
+    tests = [
+        ":azure_core_cpp_uses_only_openssl",
+        ":curl_aws_lc_uses_only_aws_lc",
+        ":curl_boringssl_uses_only_boringssl",
+        ":curl_mbedtls_uses_only_mbedtls",
+        ":curl_openssl_uses_only_openssl",
+        ":fastdds_uses_only_openssl",
+        ":folly_uses_only_openssl",
+        ":librdkafka_openssl_curl_mbedtls_uses_exact_backends",
+        ":librdkafka_uses_only_openssl",
+        ":ppp_uses_only_openssl",
+    ],
+)

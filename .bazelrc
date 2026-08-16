@@ -1,0 +1,78 @@
+common --registry=https://bcr.bazel.build/
+common --registry=https://raw.githubusercontent.com/jwnimmer-tri/bazel-central-registry/7d124815dfe1eb827d34b50b558d81401473297c/
+common --lockfile_mode=error
+common --noenable_platform_specific_config
+
+# Resolve every C/C++ action through Hermetic Build's zero-sysroot LLVM
+# toolchain. A fixed Linux target makes host-native and Android target
+# toolchains incompatible, and --extra_toolchains gives LLVM command-line
+# priority in addition to its root-module registration.
+build --platforms=//toolchains:hermetic_linux_x86_64_gnu_2_28
+build --extra_toolchains=@llvm//toolchain:all
+
+# Do not leak host tool settings into build actions. Bazel downloads both Java
+# runtimes, repository rules must declare environment inputs, and actions cannot
+# access the network.
+build --incompatible_strict_action_env
+build --experimental_strict_repo_env
+build --java_runtime_version=remotejdk_21
+build --tool_java_runtime_version=remotejdk_21
+build --nosandbox_default_allow_network
+
+# Match ssl_lib at registry commit 7d124815: BoringSSL is the default. A later
+# command-line --config=openssl, --config=aws-lc, or curl-scoped
+# --config=curl-mbedtls overrides these values.
+build --config=boringssl
+
+# Spell out every backend-sensitive switch so the facade target and each
+# dependency's source-level API mode remain congruent.
+build:boringssl --@ssl_lib//:crypto=@boringssl//:crypto
+build:boringssl --@ssl_lib//:ssl=@boringssl//:ssl
+build:boringssl --@boost.asio//:ssl=boringssl
+build:boringssl --@boost.mysql//:ssl=boringssl
+build:boringssl --@boost.mqtt5//:ssl=boringssl
+build:boringssl --@clickhouse-cpp//:tls=boringssl
+build:boringssl --@curl//:ssl_lib=boringssl
+build:boringssl --@ffmpeg//:enable_boringssl=True
+build:boringssl --@ffmpeg//:enable_openssl=False
+build:boringssl --@grpc//third_party:grpc_use_openssl=False
+build:boringssl --@libgit2//:use_https=openssl
+build:boringssl --@postgres//:with_ssl=boringssl
+
+build:openssl --@ssl_lib//:crypto=@openssl//:crypto
+build:openssl --@ssl_lib//:ssl=@openssl//:ssl
+build:openssl --@boost.asio//:ssl=openssl
+build:openssl --@boost.mysql//:ssl=openssl
+build:openssl --@boost.mqtt5//:ssl=openssl
+build:openssl --@clickhouse-cpp//:tls=openssl
+build:openssl --@curl//:ssl_lib=openssl
+build:openssl --@ffmpeg//:enable_boringssl=False
+build:openssl --@ffmpeg//:enable_openssl=True
+build:openssl --@grpc//third_party:grpc_use_openssl=True
+build:openssl --@libgit2//:use_https=openssl
+build:openssl --@postgres//:with_ssl=openssl
+
+# Mbed TLS is not OpenSSL-API-compatible. Keep this configuration curl-specific:
+# curl selects its native Mbed TLS sources, while ssl_lib's two facade labels
+# both point at the monolithic BCR Mbed TLS library for a congruent setting set.
+build:curl-mbedtls --@ssl_lib//:crypto=@mbedtls//:mbedtls
+build:curl-mbedtls --@ssl_lib//:ssl=@mbedtls//:mbedtls
+build:curl-mbedtls --@curl//:ssl_lib=mbedtls
+
+# AWS-LC implements the BoringSSL API, so dependencies select their BoringSSL
+# source mode while ssl_lib redirects the actual libraries to AWS-LC.
+build:aws-lc --@ssl_lib//:crypto=@aws-lc//:crypto
+build:aws-lc --@ssl_lib//:ssl=@aws-lc//:ssl
+build:aws-lc --@boost.asio//:ssl=boringssl
+build:aws-lc --@boost.mysql//:ssl=boringssl
+build:aws-lc --@boost.mqtt5//:ssl=boringssl
+build:aws-lc --@clickhouse-cpp//:tls=boringssl
+build:aws-lc --@curl//:ssl_lib=boringssl
+build:aws-lc --@ffmpeg//:enable_boringssl=True
+build:aws-lc --@ffmpeg//:enable_openssl=False
+build:aws-lc --@grpc//third_party:grpc_use_openssl=False
+build:aws-lc --@libgit2//:use_https=openssl
+build:aws-lc --@postgres//:with_ssl=boringssl
+
+build --cxxopt=-std=c++20
+build --host_cxxopt=-std=c++20

@@ -1,0 +1,36 @@
+diff --git a/BUILD.bazel b/BUILD.bazel
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -3,13 +3,12 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
+ cc_library(
+     name = "lz4",
+     srcs = [
+         "lib/lz4.c",
+-        "lib/xxhash.c",
+-        "lib/xxhash.h",
+     ],
+     hdrs = [
+         "lib/lz4.h",
+     ],
+     strip_include_prefix = "lib/",
+     visibility = ["//visibility:public"],
++    deps = ["@xxhash//:xxhash"],
+ )
+@@ -74,8 +73,5 @@ cc_library(
+ cc_library(
+     name = "lz4_xxhash_include",
+-    hdrs = [
+-        "lib/xxhash.h",
+-    ],
+-    strip_include_prefix = "lib/",
+     visibility = ["//:__subpackages__"],
++    deps = ["@xxhash//:xxhash"],
+ )
+diff --git a/MODULE.bazel b/MODULE.bazel
+--- a/MODULE.bazel
++++ b/MODULE.bazel
+@@ -8,3 +8,4 @@ module(
+ bazel_dep(name = "rules_cc", version = "0.2.8")
+ bazel_dep(name = "platforms", version = "1.0.0")
+ bazel_dep(name = "bazel_skylib", version = "1.8.1")
++bazel_dep(name = "xxhash", version = "0.8.3.bcr.1")

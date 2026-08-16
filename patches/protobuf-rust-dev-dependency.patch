@@ -1,0 +1,17 @@
+diff --git a/MODULE.bazel b/MODULE.bazel
+index c1bc07637..1d1a59cc4 100644
+--- a/MODULE.bazel
++++ b/MODULE.bazel
+@@ -194,7 +194,11 @@ rust.toolchain(
+     versions = ["1.85.0"],
+ )
+ 
+-crate = use_extension("@rules_rust//crate_universe:extension.bzl", "crate")
++# These crates are used only by Protobuf's own Rust tests. A non-root module
++# cannot repin a lockfile-less crate_universe extension, so do not evaluate this
++# development-only extension when Protobuf is consumed transitively.
++crate = use_extension(
++    "@rules_rust//crate_universe:extension.bzl", "crate", dev_dependency = True)
+ crate.spec(
+     package = "googletest",
+     version = ">0.0.0",

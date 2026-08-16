@@ -1,0 +1,211 @@
+load(
+    ":backend_transitions.bzl",
+    "aws_lc_filegroup",
+    "boringssl_filegroup",
+    "curl_mbedtls_filegroup",
+    "librdkafka_openssl_curl_mbedtls_filegroup",
+    "openssl_filegroup",
+)
+
+package(default_visibility = ["//visibility:public"])
+
+# One independently buildable smoke target for every module named in the BCR
+# discussion, plus librdkafka. Prefer the SSL-bearing target when a module
+# exposes several public entry points.
+alias(
+    name = "asio",
+    actual = "@asio//:asio",
+)
+
+alias(
+    name = "aws_sdk",
+    actual = "@aws_sdk//:core",
+)
+
+alias(
+    name = "_azure_core_cpp_unconfigured",
+    actual = "@azure-core-cpp//:azure_core_cpp",
+    visibility = ["//visibility:private"],
+)
+
+# Azure Core's curl transport directly uses OpenSSL OCSP APIs. Keep the facade
+# migration, but select the implementation its source actually supports; the
+# transition also reaches Azure's transitive curl dependency.
+openssl_filegroup(
+    name = "azure-core-cpp",
+    srcs = [":_azure_core_cpp_unconfigured"],
+)
+
+alias(
+    name = "boost.asio",
+    actual = "@boost.asio//:boost.asio",
+)
+
+alias(
+    name = "boost.mysql",
+    actual = "@boost.mysql//:boost.mysql",
+)
+
+alias(
+    name = "boost.mqtt5",
+    actual = "@boost.mqtt5//:boost.mqtt5",
+)
+
+alias(
+    name = "clickhouse-cpp",
+    actual = "@clickhouse-cpp//:clickhouse",
+)
+
+alias(
+    name = "curl",
+    actual = "@curl//:curl",
+)
+
+alias(
+    name = "_fastdds_unconfigured",
+    actual = "@fastdds//:fastdds",
+    visibility = ["//visibility:private"],
+)
+
+# FastDDS security includes OpenSSL-only headers such as openssl/types.h.
+openssl_filegroup(
+    name = "fastdds",
+    srcs = [":_fastdds_unconfigured"],
+)
+
+alias(
+    name = "ffmpeg",
+    actual = "@ffmpeg//:avformat",
+)
+
+alias(
+    name = "_folly_unconfigured",
+    actual = "@folly//folly/io/async:async_ssl_socket",
+    visibility = ["//visibility:private"],
+)
+
+# Folly's AsyncSSLSocket uses OpenSSL-only stack, session, and group APIs.
+openssl_filegroup(
+    name = "folly",
+    srcs = [":_folly_unconfigured"],
+)
+
+alias(
+    name = "git",
+    actual = "@git//:git",
+)
+
+alias(
+    name = "grpc",
+    actual = "@grpc//:grpc",
+)
+
+alias(
+    name = "libevent",
+    actual = "@libevent//:event_openssl",
+)
+
+alias(
+    name = "libgit2",
+    actual = "@libgit2//:libgit2",
+)
+
+alias(
+    name = "postgres",
+    actual = "@postgres//:libpq",
+)
+
+alias(
+    name = "_ppp_unconfigured",
+    actual = "@ppp//:pppd",
+    visibility = ["//visibility:private"],
+)
+
+# PPP's EAP-TLS sources use OpenSSL-specific UI and engine APIs.
+openssl_filegroup(
+    name = "ppp",
+    srcs = [":_ppp_unconfigured"],
+)
+
+alias(
+    name = "rsync",
+    actual = "@rsync//:rsync",
+)
+
+alias(
+    name = "_librdkafka_unconfigured",
+    actual = "@librdkafka//:librdkafka",
+    visibility = ["//visibility:private"],
+)
+
+# librdkafka's TLS implementation uses OpenSSL-specific APIs. It still consumes
+# ssl_lib, but is intentionally not presented as a multi-backend consumer.
+openssl_filegroup(
+    name = "librdkafka",
+    srcs = [":_librdkafka_unconfigured"],
+)
+
+# librdkafka itself remains OpenSSL-backed, while a nested transition on its
+# curl dependency selects curl's native Mbed TLS implementation.
+librdkafka_openssl_curl_mbedtls_filegroup(
+    name = "librdkafka_openssl_curl_mbedtls",
+    srcs = [":_librdkafka_unconfigured"],
+)
+
+filegroup(
+    name = "all_modules",
+    srcs = [
+        ":asio",
+        ":aws_sdk",
+        ":azure-core-cpp",
+        ":boost.asio",
+        ":boost.mqtt5",
+        ":boost.mysql",
+        ":clickhouse-cpp",
+        ":curl",
+        ":fastdds",
+        ":ffmpeg",
+        ":folly",
+        ":git",
+        ":grpc",
+        ":libevent",
+        ":libgit2",
+        ":librdkafka",
+        ":postgres",
+        ":ppp",
+        ":rsync",
+    ],
+)
+
+# curl natively supports OpenSSL, BoringSSL-compatible APIs, and Mbed TLS. These
+# rules transition the same curl target directly, allowing all implementations
+# to coexist regardless of the command-line default.
+boringssl_filegroup(
+    name = "curl_boringssl",
+    srcs = [":curl"],
+)
+
+openssl_filegroup(
+    name = "curl_openssl",
+    srcs = [":curl"],
+)
+
+aws_lc_filegroup(
+    name = "curl_aws_lc",
+    srcs = [":curl"],
+)
+
+curl_mbedtls_filegroup(
+    name = "curl_mbedtls",
+    srcs = [":curl"],
+)
+
+filegroup(
+    name = "curl_backend_matrix",
+    srcs = [
+        ":curl_aws_lc",
+        ":curl_boringssl",
+        ":curl_mbedtls",
+        ":curl_openssl",
+    ],
+)

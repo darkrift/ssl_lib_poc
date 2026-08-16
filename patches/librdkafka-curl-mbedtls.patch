@@ -1,0 +1,74 @@
+diff --git a/BUILD.bazel b/BUILD.bazel
+index 4be1cdb..19102e4 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -1,5 +1,6 @@
+ load("@bazel_skylib//lib:selects.bzl", "selects")
+ load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
+ load("@bazel_skylib//rules:expand_template.bzl", "expand_template")
+ load("@rules_cc//cc:cc_test.bzl", "cc_test")
+ load("@rules_cc//cc:defs.bzl", "cc_library")
++load(":curl_transition.bzl", "curl_mbedtls_cc_library")
+@@ -21,3 +22,18 @@
++curl_mbedtls_cc_library(
++    name = "curl_mbedtls",
++    visibility = ["//visibility:public"],
++    deps = ["@curl"],
++)
++
++# This label flag keeps the upstream curl dependency by default. A parent rule
++# can instead select :curl_mbedtls without changing librdkafka's own OpenSSL
++# configuration.
++label_flag(
++    name = "curl_dependency",
++    build_setting_default = "@curl//:curl",
++    visibility = ["//visibility:public"],
++)
++
+ bool_flag(
+     name = "with_ssl",
+     build_setting_default = True,
+@@ -207,7 +224,7 @@ cc_library(
+     deps = [
+         "@lz4//:lz4_hc",
+     ] + select({
+-        ":with_curl_setting": ["@curl"],
++        ":with_curl_setting": [":curl_dependency"],
+         "//conditions:default": [],
+     }) + select({
+         ":with_ssl_setting": [
+diff --git a/MODULE.bazel b/MODULE.bazel
+index fc157c8..50137ee 100644
+--- a/MODULE.bazel
++++ b/MODULE.bazel
+@@ -9,8 +9,10 @@ module(
+ bazel_dep(name = "bazel_skylib", version = "1.7.1")
+ bazel_dep(name = "curl", version = "8.12.0.bcr.1")
+ bazel_dep(name = "lz4", version = "1.9.4")
++bazel_dep(name = "mbedtls", version = "3.6.7")
+ bazel_dep(name = "ssl_lib", version = "1.0.0")
+ bazel_dep(name = "platforms", version = "0.0.11")
+ bazel_dep(name = "rules_cc", version = "0.1.1")
++bazel_dep(name = "with_cfg.bzl", version = "1.0.0")
+ bazel_dep(name = "zlib", version = "1.3.1.bcr.5")
+ bazel_dep(name = "zstd", version = "1.5.7")
+diff --git a/curl_transition.bzl b/curl_transition.bzl
+new file mode 100644
+index 0000000..0508788
+--- /dev/null
++++ b/curl_transition.bzl
+@@ -0,0 +1,14 @@
++"""A dependency-edge transition for curl's native Mbed TLS backend."""
++
++load("@rules_cc//cc:defs.bzl", "cc_library")
++load("@with_cfg.bzl", "with_cfg")
++
++_builder = with_cfg(cc_library)
++
++# Mbed TLS has its own API and one monolithic BCR target. Select curl's native
++# source mode and keep both ssl_lib facade labels congruent within this subtree.
++_builder.set(Label("@curl//:ssl_lib"), "mbedtls")
++_builder.set(Label("@ssl_lib//:crypto"), Label("@mbedtls//:mbedtls"))
++_builder.set(Label("@ssl_lib//:ssl"), Label("@mbedtls//:mbedtls"))
++
++curl_mbedtls_cc_library, _curl_mbedtls_cc_library_internal = _builder.build()

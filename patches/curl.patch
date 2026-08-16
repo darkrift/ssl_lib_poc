@@ -1,0 +1,33 @@
+diff --git a/BUILD.bazel b/BUILD.bazel
+index 5e1c95d..3217fef 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -382,13 +382,13 @@ cc_library(
+         visibility = ["//visibility:public"],
+         deps = select({
+             ":use_boringssl": [
+-                "@boringssl//:crypto",
+-                "@boringssl//:ssl",
++                "@ssl_lib//:crypto",
++                "@ssl_lib//:ssl",
+             ],
+             ":use_mbedtls": ["@mbedtls"],
+             ":use_openssl": [
+-                "@openssl//:crypto",
+-                "@openssl//:ssl",
++                "@ssl_lib//:crypto",
++                "@ssl_lib//:ssl",
+             ],
+             "//conditions:default": [],
+         }),
+diff --git a/MODULE.bazel b/MODULE.bazel
+index d7ef1b8..255e2e2 100644
+--- a/MODULE.bazel
++++ b/MODULE.bazel
+@@ -9,5 +9,4 @@ bazel_dep(name = "bazel_skylib", version = "1.9.2")
+ bazel_dep(name = "rules_cc", version = "0.2.22")
+ bazel_dep(name = "mbedtls", version = "3.6.7")
+ bazel_dep(name = "platforms", version = "1.1.0")
+-bazel_dep(name = "boringssl", version = "0.20260616.0")
+-bazel_dep(name = "openssl", version = "4.0.1.bcr.0")
++bazel_dep(name = "ssl_lib", version = "1.0.0")

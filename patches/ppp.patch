@@ -1,0 +1,50 @@
+diff --git a/BUILD.bazel b/BUILD.bazel
+index 3437b0d..f4fe28b 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -459,7 +459,7 @@ cc_library(
+     deps = [
+         ":pppd_headers",
+     ] + select({
+-        ":openssl_enabled": ["@openssl//:crypto"],
++        ":openssl_enabled": ["@ssl_lib//:crypto"],
+         "//conditions:default": [],
+     }),
+ )
+@@ -574,7 +574,7 @@ cc_binary(
+         ":pppd_crypto",
+         ":pppd_linkopts",
+     ] + select({
+-        ":openssl_enabled": ["@openssl//:ssl"],
++        ":openssl_enabled": ["@ssl_lib//:ssl"],
+         "//conditions:default": [],
+     }) + select({
+         ":filter_enabled": ["@libpcap"],
+@@ -858,7 +858,7 @@ cc_test(
+     deps = [
+         ":pppd_headers",
+     ] + select({
+-        ":openssl_enabled": ["@openssl//:crypto"],
++        ":openssl_enabled": ["@ssl_lib//:crypto"],
+         "//conditions:default": [],
+     }),
+ )
+@@ -931,6 +931,6 @@ cc_test(
+     deps = [
+         ":pppd_crypto",
+         ":pppd_headers",
+-        "@openssl//:ssl",
++        "@ssl_lib//:ssl",
+     ],
+ )
+diff --git a/MODULE.bazel b/MODULE.bazel
+index 41cd28f..1bf1135 100644
+--- a/MODULE.bazel
++++ b/MODULE.bazel
+@@ -10,5 +10,5 @@ bazel_dep(name = "bazel_skylib", version = "1.8.2")
+ bazel_dep(name = "platforms", version = "1.0.0")
+ bazel_dep(name = "rules_cc_autoconf", version = "0.11.1")
+ bazel_dep(name = "rules_cc", version = "0.2.4")
+-bazel_dep(name = "openssl", version = "3.5.5.bcr.4")
++bazel_dep(name = "ssl_lib", version = "1.0.0")
+ bazel_dep(name = "libpcap", version = "1.10.5.bcr.3")

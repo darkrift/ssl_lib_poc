@@ -1,0 +1,28 @@
+diff --git a/MODULE.bazel b/MODULE.bazel
+index 2a9be97..dd4635c 100644
+--- a/MODULE.bazel
++++ b/MODULE.bazel
+@@ -45,7 +45,7 @@ bazel_dep(name = "libsodium", version = "1.0.19")
+ bazel_dep(name = "libunwind", version = "1.8.1")
+ bazel_dep(name = "liburing", version = "2.15")
+ bazel_dep(name = "lz4", version = "1.9.4.bcr.2")
+-bazel_dep(name = "openssl", version = "3.5.5.bcr.0")
++bazel_dep(name = "ssl_lib", version = "1.0.0")
+ bazel_dep(name = "platforms", version = "1.0.0")
+ bazel_dep(name = "range-v3", version = "0.12.0")
+ bazel_dep(name = "rules_cc", version = "0.2.18")
+diff --git a/folly/portability/BUILD.bazel b/folly/portability/BUILD.bazel
+index b2b8b60..a24f73e 100644
+--- a/folly/portability/BUILD.bazel
++++ b/folly/portability/BUILD.bazel
+@@ -176,8 +176,8 @@ cpp_library(
+     deps = [
+         ":windows",
+         "//folly:portability",
+-        "@openssl//:crypto",
+-        "@openssl//:ssl",
++        "@ssl_lib//:crypto",
++        "@ssl_lib//:ssl",
+     ],
+ )
+ 

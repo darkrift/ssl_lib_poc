@@ -1,0 +1,32 @@
+diff --git a/BUILD.bazel b/BUILD.bazel
+index 4e998b8..452a755 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -55,12 +55,12 @@ cc_library(
+         "@boost.type_traits",
+     ] + select({
+         ":boringssl": [
+-            "@boringssl//:crypto",
+-            "@boringssl//:ssl",
++            "@ssl_lib//:crypto",
++            "@ssl_lib//:ssl",
+         ],
+         ":openssl": [
+-            "@openssl//:crypto",
+-            "@openssl//:ssl",
++            "@ssl_lib//:crypto",
++            "@ssl_lib//:ssl",
+         ],
+     }),
+ )
+diff --git a/MODULE.bazel b/MODULE.bazel
+index 986f739..c6a7359 100644
+--- a/MODULE.bazel
++++ b/MODULE.bazel
+@@ -18,5 +18,5 @@ bazel_dep(name = "boost.range", version = "1.90.0.bcr.1")
+ bazel_dep(name = "boost.smart_ptr", version = "1.90.0.bcr.1")
+ bazel_dep(name = "boost.system", version = "1.90.0.bcr.1")
+ bazel_dep(name = "boost.type_traits", version = "1.90.0.bcr.1")
+-bazel_dep(name = "openssl", version = "3.5.4.bcr.1")
++bazel_dep(name = "ssl_lib", version = "1.0.0")
+ bazel_dep(name = "rules_cc", version = "0.2.16")

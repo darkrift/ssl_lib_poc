@@ -1,0 +1,39 @@
+diff --git a/MODULE.bazel b/MODULE.bazel
+index cfe9943..e04c427 100644
+--- a/MODULE.bazel
++++ b/MODULE.bazel
+@@ -8,7 +8,7 @@ module(
+ bazel_dep(name = "bazel_skylib", version = "1.8.2")
+ bazel_dep(name = "libssh2", version = "1.11.1.bcr.1")
+ bazel_dep(name = "mbedtls", version = "3.6.5")
+-bazel_dep(name = "openssl", version = "3.5.5.bcr.0")
++bazel_dep(name = "ssl_lib", version = "1.0.0")
+ bazel_dep(name = "platforms", version = "1.0.0")
+ bazel_dep(name = "rules_cc", version = "0.2.4")
+ bazel_dep(name = "zlib", version = "1.3.2")
+diff --git a/src/libgit2/BUILD.bazel b/src/libgit2/BUILD.bazel
+index 0ecb7e5..97aef2d 100644
+--- a/src/libgit2/BUILD.bazel
++++ b/src/libgit2/BUILD.bazel
+@@ -28,7 +28,7 @@ cc_library(
+         "//include:git2",
+     ] + select({
+         "//src/util:use_https_mbedtls": ["@mbedtls"],
+-        "//src/util:use_https_openssl": ["@openssl//:ssl"],
++        "//src/util:use_https_openssl": ["@ssl_lib//:ssl"],
+         "//conditions:default": [],
+     }) + select({
+         "//src/util:use_ssh_libssh2": ["@libssh2"],
+diff --git a/src/util/BUILD.bazel b/src/util/BUILD.bazel
+index b9fdc64..e8c9741 100644
+--- a/src/util/BUILD.bazel
++++ b/src/util/BUILD.bazel
+@@ -129,7 +129,7 @@ cc_library(
+         "@zlib",
+     ] + select({
+         ":use_https_mbedtls": ["@mbedtls"],
+-        ":use_https_openssl": ["@openssl//:ssl"],
++        ":use_https_openssl": ["@ssl_lib//:ssl"],
+         "//conditions:default": [],
+     }),
+ )

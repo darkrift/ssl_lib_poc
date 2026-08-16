@@ -1,0 +1,32 @@
+diff --git a/BUILD.bazel b/BUILD.bazel
+index 88ef872..5535caf 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -458,7 +458,7 @@ cc_library(
+     deps = [
+         "//compat:headers",
+         "//contrib/bazel:angle_include_shims",
+-        "@openssl//:ssl",
++        "@ssl_lib//:ssl",
+     ],
+ )
+ 
+@@ -1250,7 +1250,7 @@ cc_library(
+         "//trace2",
+         "//xdiff",
+         "@curl",
+-        "@openssl//:ssl",
++        "@ssl_lib//:ssl",
+         "@zlib",
+     ],
+     alwayslink = True,
+diff --git a/MODULE.bazel b/MODULE.bazel
+index c5b168d..8bf67ee 100644
+--- a/MODULE.bazel
++++ b/MODULE.bazel
+@@ -14,4 +14,4 @@ bazel_dep(name = "platforms", version = "1.1.0")
+ bazel_dep(name = "zlib", version = "1.3.1.bcr.8")
+ bazel_dep(name = "curl", version = "8.11.0.bcr.4")
+ bazel_dep(name = "libexpat", version = "2.7.1.bcr.1")
+-bazel_dep(name = "openssl", version = "3.5.4.bcr.0")
++bazel_dep(name = "ssl_lib", version = "1.0.0")

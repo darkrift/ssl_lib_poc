@@ -1,0 +1,18 @@
+diff --git a/BUILD.bazel b/BUILD.bazel
+index 849029a..5e03127 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -17,11 +17,11 @@ cc_binary(
+ 
+ genrule(
+     name = "container_node_sizes_impl",
+-    srcs = [":foonathan_memory_node_size_debugger"],
+     outs = [
+ 	"container_node_sizes_impl.hpp"
+     ],
+-    cmd = "$(location :foonathan_memory_node_size_debugger) --code $@"
++    cmd = "$(location :foonathan_memory_node_size_debugger) --code $@",
++    tools = [":foonathan_memory_node_size_debugger"],
+ )
+ 
+ cmake_configure_file(

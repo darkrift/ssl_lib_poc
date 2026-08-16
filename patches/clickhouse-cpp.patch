@@ -1,0 +1,36 @@
+diff --git a/BUILD.bazel b/BUILD.bazel
+index e6faad4..5b35890 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -158,12 +158,12 @@ cc_library(
+         "@zstd//:zstd",
+     ] + select({
+         ":tls_boringssl": [
+-            "@boringssl//:crypto",
+-            "@boringssl//:ssl",
++            "@ssl_lib//:crypto",
++            "@ssl_lib//:ssl",
+         ],
+         ":tls_openssl": [
+-            "@openssl//:crypto",
+-            "@openssl//:ssl",
++            "@ssl_lib//:crypto",
++            "@ssl_lib//:ssl",
+         ],
+         ":tls_no": [],
+     }),
+diff --git a/MODULE.bazel b/MODULE.bazel
+index b1d7985..73e43f6 100644
+--- a/MODULE.bazel
++++ b/MODULE.bazel
+@@ -6,9 +6,8 @@ module(name = "clickhouse-cpp", version = "2.6.2")
+ # See PR discussion; the attribute is a no-op from Bazel 9.1.0 onwards.
+ bazel_dep(name = "abseil-cpp", version = "20260107.1")
+ bazel_dep(name = "bazel_skylib", version = "1.9.0")
+-bazel_dep(name = "boringssl", version = "0.20260526.0")
++bazel_dep(name = "ssl_lib", version = "1.0.0")
+ bazel_dep(name = "lz4", version = "1.10.0.bcr.1")
+-bazel_dep(name = "openssl", version = "3.5.5.bcr.4")
+ bazel_dep(name = "platforms", version = "1.1.0")
+ bazel_dep(name = "rules_cc", version = "0.2.19")
+ bazel_dep(name = "zstd", version = "1.5.7.bcr.1")

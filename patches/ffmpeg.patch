@@ -1,0 +1,47 @@
+diff --git a/BUILD.bazel b/BUILD.bazel
+index 5bab32d..2df6caa 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -815,8 +815,8 @@ cc_variant_library(
+     }),
+     visibility = ["//visibility:public"],
+     deps = select({
+-        "//:enable_boringssl_is_true": ["@boringssl//:crypto"],
+-        "//:enable_openssl_is_true": ["@openssl//:crypto"],
++        "//:enable_boringssl_is_true": ["@ssl_lib//:crypto"],
++        "//:enable_openssl_is_true": ["@ssl_lib//:crypto"],
+         "//conditions:default": [],
+     }),
+ )
+@@ -1231,8 +1231,8 @@ cc_variant_library(
+         "@bzip2//:bz2",
+         "@zlib",
+     ] + select({
+-        "//:enable_openssl_is_true": ["@openssl//:ssl"],
+-        "//:enable_boringssl_is_true": ["@boringssl//:ssl"],
++        "//:enable_openssl_is_true": ["@ssl_lib//:ssl"],
++        "//:enable_boringssl_is_true": ["@ssl_lib//:ssl"],
+         "//conditions:default": [],
+     }) + select({
+         "//:enable_mbedtls_is_true": ["@mbedtls"],
+diff --git a/MODULE.bazel b/MODULE.bazel
+index 3ebd9b7..08e4b51 100644
+--- a/MODULE.bazel
++++ b/MODULE.bazel
+@@ -10,7 +10,7 @@ bazel_dep(name = "alsa_lib", version = "1.2.9.bcr.4")
+ bazel_dep(name = "aom", version = "3.13.3.bcr.1")
+ bazel_dep(name = "apple_support", version = "2.3.0")
+ bazel_dep(name = "bazel_skylib", version = "1.8.2")
+-bazel_dep(name = "boringssl", version = "0.20260713.0")
++bazel_dep(name = "ssl_lib", version = "1.0.0")
+ bazel_dep(name = "bzip2", version = "1.0.8.bcr.3")
+ bazel_dep(name = "freetype", version = "2.14.1")
+ bazel_dep(name = "gmp", version = "6.2.0.bcr.1")
+@@ -23,7 +23,6 @@ bazel_dep(name = "libxml2", version = "2.15.1.bcr.1")
+ bazel_dep(name = "libzmq", version = "4.3.5.bcr.4")
+ bazel_dep(name = "mbedtls", version = "3.6.5")
+ bazel_dep(name = "opencv", version = "4.13.0.bcr.2")
+-bazel_dep(name = "openssl", version = "3.5.5.bcr.3")
+ bazel_dep(name = "opus", version = "1.6.0")
+ bazel_dep(name = "platforms", version = "1.0.0")
+ bazel_dep(name = "rules_cc", version = "0.2.4")

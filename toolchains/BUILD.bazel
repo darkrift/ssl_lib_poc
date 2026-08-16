@@ -1,0 +1,20 @@
+package(default_visibility = ["//visibility:public"])
+
+# Keep external repository labels out of command-line platform flags. Commands
+# such as `bazel info` parse those flags before Bzlmod has installed the root
+# repository mapping, while an alias in the main repository resolves normally.
+alias(
+    name = "hermetic_linux_x86_64_gnu_2_28",
+    actual = "@llvm//platforms:linux_x86_64_gnu.2.28",
+)
+
+# Bazel 9's default test toolchain forces a test execution platform to match
+# the target platform. Analysis tests only execute Bazel's generated pass/fail
+# stub, so requiring a Linux executor while cross-compiling on macOS is both
+# unnecessary and impossible locally. This empty toolchain changes scheduling
+# only; it provides no compiler or other host tool.
+toolchain(
+    name = "platform_independent_test_toolchain",
+    toolchain = "@bazel_tools//tools/test:empty_toolchain",
+    toolchain_type = "@bazel_tools//tools/test:default_test_toolchain_type",
+)

@@ -1,0 +1,47 @@
+diff --git a/MODULE.bazel b/MODULE.bazel
+index ac9d932..553d4d6 100644
+--- a/MODULE.bazel
++++ b/MODULE.bazel
+@@ -40,7 +40,7 @@ single_version_override(
+ bazel_dep(name = "platforms", version = "1.0.0")
+ bazel_dep(name = "apple_support", version = "1.19.0", repo_name = "build_bazel_apple_support")
+ bazel_dep(name = "bazel_skylib", version = "1.8.1")
+-bazel_dep(name = "boringssl", version = "0.20241024.0")  # mismatched 20241211
++bazel_dep(name = "ssl_lib", version = "1.0.0")  # mismatched 20241211
+ bazel_dep(name = "c-ares", version = "1.19.1", repo_name = "com_github_cares_cares")
+ bazel_dep(name = "envoy_api", version = "0.0.0-20251216-6ef568c")
+ bazel_dep(name = "googleapis-cc", version = "1.0.0")
+@@ -48,7 +48,6 @@ bazel_dep(name = "googleapis-grpc-cc", version = "1.0.0")
+ bazel_dep(name = "googleapis-python", version = "1.0.0")
+ bazel_dep(name = "googletest", version = "1.17.0", repo_name = "com_google_googletest")
+ bazel_dep(name = "opencensus-cpp", version = "0.0.0-20230502-50eb5de.bcr.2", repo_name = "io_opencensus_cpp")
+-bazel_dep(name = "openssl", version = "3.3.1.bcr.1")
+ bazel_dep(name = "opentelemetry-cpp", version = "1.19.0", repo_name = "io_opentelemetry_cpp")
+ 
+ # --- Protobuf related packages.
+diff --git a/third_party/BUILD b/third_party/BUILD
+index ff2dcae..649db1f 100644
+--- a/third_party/BUILD
++++ b/third_party/BUILD
+@@ -33,8 +33,8 @@ config_setting(
+ alias(
+     name = "libssl",
+     actual = select({
+-        ":grpc_use_openssl_setting": "@openssl//:ssl",
+-        "//conditions:default": "@boringssl//:ssl",
++        ":grpc_use_openssl_setting": "@ssl_lib//:ssl",
++        "//conditions:default": "@ssl_lib//:ssl",
+     }),
+     tags = ["manual"],
+ )
+@@ -42,8 +42,8 @@ alias(
+ alias(
+     name = "libcrypto",
+     actual = select({
+-        ":grpc_use_openssl_setting": "@openssl//:crypto",
+-        "//conditions:default": "@boringssl//:crypto",
++        ":grpc_use_openssl_setting": "@ssl_lib//:crypto",
++        "//conditions:default": "@ssl_lib//:crypto",
+     }),
+     tags = ["manual"],
+ )
